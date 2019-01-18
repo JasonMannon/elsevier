@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import API from './services/api'
-import PatientSearch from './components/PatientSearch'
+import API from './services/api';
+import PatientSearch from './components/PatientSearch';
+import PatientData from './components/PatientData';
 import Typography from '@material-ui/core/Typography';
 
 class App extends Component {
@@ -14,6 +15,7 @@ class App extends Component {
       error: false,
       errorMessage: '',
       loading: false,
+      patient: null,
       patientId: ''
     }
   }
@@ -31,7 +33,10 @@ class App extends Component {
     const response = await api.getPatient(patientId)
 
     if (response.ok) {
+      const { resource: patient } = response.data.entry[0]
+
       this.setState({
+        patient,
         loading: false
       })
     } else {
@@ -46,7 +51,7 @@ class App extends Component {
   }
 
   render() {
-    const { error, errorMessage, loading, patientId } = this.state
+    const { error, errorMessage, loading, patient, patientId } = this.state
 
     return (
       <div className="App">
@@ -63,6 +68,8 @@ class App extends Component {
           patientId={patientId}
           type='number'
         />
+
+        { patient ? <PatientData patient={patient}/> : ''}
       </div>
     );
   }

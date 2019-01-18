@@ -15,7 +15,7 @@ const create = (dispatch, host = defaultHost) => {
   })
 
   const getPatient = (patientId) =>
-    api.get(`?_id=${patientId}`)
+    api.get(`?_id=${patientId}&status=active`)
 
   return {
     getPatient
