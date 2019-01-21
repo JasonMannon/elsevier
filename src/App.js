@@ -17,7 +17,7 @@ class App extends Component {
       conditions: {},
       error: false,
       errorMessage: '',
-      loadingPatient: false,
+      loadingData: false,
       patient: null,
       patientId: ''
     };
@@ -33,20 +33,21 @@ class App extends Component {
     const { api, patientId } = this.state
     const response = await api.getPatient(patientId)
 
-    if (response.ok) {
+    if (response.ok && response.data.entry) {
       const { resource: patient } = response.data.entry[0]
 
       this.setState({
-        patient: reshapePatient(patient),
-        loadingPatient: false
+        patient: reshapePatient(patient)
       });
+
+      this.handleGetConditions();
     } else {
-      const { data: errorMessage } = response
+      const errorMessage = (!response.ok ? response.data : 'Patient Not Found')
 
       this.setState({
         error: true,
         errorMessage,
-        loadingPatient: false
+        loadingData: false
       });
     };
   };
@@ -59,19 +60,25 @@ class App extends Component {
       const { entry: conditions } = response.data
 
       this.setState({
-        conditions: conditions.map(reshapeCondition)
+        conditions: conditions.map(reshapeCondition),
+        loadingData: false
       });
     };
   };
 
   handleOnClick = () => {
-    this.setState({ error: false, loadingPatient: true });
+    this.setState({
+      error: false,
+      loadingData: true,
+      patient: null,
+      conditions: {}
+    });
+
     this.handleGetPatient();
-    this.handleGetConditions();
   };
 
   render() {
-    const { conditions, error, errorMessage, loadingPatient, patient, patientId } = this.state
+    const { conditions, error, errorMessage, loadingData, patient, patientId } = this.state
 
     return (
       <div className="App">
@@ -84,14 +91,14 @@ class App extends Component {
           errorMessage={errorMessage}
           handleChange={this.handleChange}
           handleOnClick={this.handleOnClick}
-          loading={loadingPatient}
+          loading={loadingData}
           patientId={patientId}
           type='number'
         />
 
-        { patient ? <PatientData patient={patient}/> : ''}
+        { !loadingData && patient ? <PatientData patient={patient}/> : ''}
 
-        { (conditions.length > 0) ? <PatientConditions conditions={conditions}/> : '' }
+        { !loadingData && (conditions.length > 0) ? <PatientConditions conditions={conditions}/> : '' }
       </div>
     );
   }
