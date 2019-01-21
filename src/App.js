@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
 import API from './services/api';
+import reshapeCondition from './utils/reshapeConditions'
+import reshapePatient from './utils/reshapePatient'
+import PatientConditions from './components/PatientConditions'
 import PatientSearch from './components/PatientSearch';
 import PatientData from './components/PatientData';
 import Typography from '@material-ui/core/Typography';
@@ -12,13 +14,14 @@ class App extends Component {
 
     this.state = {
       api: API.create(),
+      conditions: {},
       error: false,
       errorMessage: '',
-      loading: false,
+      loadingPatient: false,
       patient: null,
       patientId: ''
-    }
-  }
+    };
+  };
 
   handleChange = (name, value) => {
     this.setState({
@@ -26,9 +29,7 @@ class App extends Component {
     });
   };
 
-  handleOnClick = async() => {
-    this.setState({ error: false, loading: true })
-
+  handleGetPatient = async() => {
     const { api, patientId } = this.state
     const response = await api.getPatient(patientId)
 
@@ -36,22 +37,41 @@ class App extends Component {
       const { resource: patient } = response.data.entry[0]
 
       this.setState({
-        patient,
-        loading: false
-      })
+        patient: reshapePatient(patient),
+        loadingPatient: false
+      });
     } else {
       const { data: errorMessage } = response
 
       this.setState({
         error: true,
         errorMessage,
-        loading: false
-      })
-    }
-  }
+        loadingPatient: false
+      });
+    };
+  };
+
+  handleGetConditions = async() => {
+    const { api, patientId } = this.state
+    const response = await api.getConditions(patientId)
+
+    if (response.ok) {
+      const { entry: conditions } = response.data
+
+      this.setState({
+        conditions: conditions.map(reshapeCondition)
+      });
+    };
+  };
+
+  handleOnClick = () => {
+    this.setState({ error: false, loadingPatient: true });
+    this.handleGetPatient();
+    this.handleGetConditions();
+  };
 
   render() {
-    const { error, errorMessage, loading, patient, patientId } = this.state
+    const { conditions, error, errorMessage, loadingPatient, patient, patientId } = this.state
 
     return (
       <div className="App">
@@ -64,12 +84,14 @@ class App extends Component {
           errorMessage={errorMessage}
           handleChange={this.handleChange}
           handleOnClick={this.handleOnClick}
-          loading={loading}
+          loading={loadingPatient}
           patientId={patientId}
           type='number'
         />
 
         { patient ? <PatientData patient={patient}/> : ''}
+
+        { (conditions.length > 0) ? <PatientConditions conditions={conditions}/> : '' }
       </div>
     );
   }

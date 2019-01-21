@@ -1,22 +1,23 @@
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
-class Patientdata extends Component {
-  constructor(props) {
-    super(props)
+const styles = theme => ({
+  root: {
+    marginTop: '3%'
   }
+});
 
+class PatientData extends Component {
   render() {
-    const { patient } = this.props
+    const { classes, patient } = this.props
 
     return (
       <div>
-        <Paper elevation={1}>
+        <Paper className={classes.root} elevation={1}>
           <Typography variant="h5" component="h3">
-            {patient.name[0].text}
+            {patient.fullName}
           </Typography>
           <Typography component="p">
             DOB: {patient.birthDate}
@@ -28,6 +29,6 @@ class Patientdata extends Component {
       </div>
     );
   };
-}
+};
 
-export default Patientdata;
+export default withStyles(styles)(PatientData);

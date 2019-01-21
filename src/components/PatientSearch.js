@@ -1,23 +1,18 @@
 import React, { Component } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import FormHelperText from '@material-ui/core/FormHelperText';
 import Typography from '@material-ui/core/Typography';
 
 class PatientSearch extends Component {
-  constructor(props) {
-    super(props)
-  }
-
   handlePatientIdChange = (event) => {
     const { value } = event.target
 
-    this.props.handleChange('patientId', value)
-  }
+    this.props.handleChange('patientId', value);
+  };
 
   handleOnClick = () => {
-    this.props.handleOnClick()
-  }
+    this.props.handleOnClick();
+  };
 
   render() {
     const { error, errorMessage, loading, patientId } = this.props
@@ -40,15 +35,15 @@ class PatientSearch extends Component {
           <Button
             color="primary"
             disabled={loading}
-            onClick={this.handleOnClick}                     
+            onClick={this.handleOnClick}
             variant="contained"
           >
             Search
           </Button>
         </div>
       </div>
-    )
-  }
-}
+    );
+  };
+};
 
 export default PatientSearch
